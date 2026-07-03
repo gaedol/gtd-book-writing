@@ -60,6 +60,9 @@ export default class GtdBookPlugin extends Plugin {
     registerCommands(this);
 
     const refresh = debounce(() => this.refreshViews(), 400, true);
+    // "resolved" fires when initial vault indexing completes — without it,
+    // books whose frontmatter wasn't cached at first render stay missing.
+    this.registerEvent(this.app.metadataCache.on("resolved", refresh));
     this.registerEvent(this.app.metadataCache.on("changed", refresh));
     this.registerEvent(this.app.vault.on("rename", refresh));
     this.registerEvent(this.app.vault.on("create", refresh));
