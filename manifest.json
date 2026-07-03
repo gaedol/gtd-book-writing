@@ -1,0 +1,9 @@
+{
+  "id": "gtd-book-writing",
+  "name": "GTD Book Writing",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Write books the GTD way: next actions, available-now scenes, stalled detection, and pacing — inside Obsidian.",
+  "author": "Marco Guidetti",
+  "isDesktopOnly": false
+}
