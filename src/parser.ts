@@ -1,4 +1,4 @@
-import { App, TFile, TFolder } from "obsidian";
+import { App, TFile, TFolder, parseYaml } from "obsidian";
 import {
   Book,
   Chapter,
@@ -9,7 +9,27 @@ import {
 } from "./model";
 
 const OPEN_TASK_RE = /^[ \t]*[-*] \[ \] (.+)$/m;
-const FRONTMATTER_RE = /^---\n[\s\S]*?\n---\n?/;
+const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n?/;
+
+// The metadata cache populates asynchronously; a file not yet indexed has no
+// cache entry, which must not make its book/scene vanish. Fall back to
+// reading and parsing the frontmatter directly.
+async function getFrontmatter(
+  app: App,
+  file: TFile,
+): Promise<Record<string, unknown>> {
+  const cached = app.metadataCache.getFileCache(file)?.frontmatter;
+  if (cached) return cached;
+  const content = await app.vault.cachedRead(file);
+  const m = content.match(FRONTMATTER_RE);
+  if (!m) return {};
+  try {
+    const parsed = parseYaml(m[1]);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
 
 function normalizeDate(v: unknown): string | null {
   if (!v) return null;
@@ -35,7 +55,7 @@ async function parseScene(
   file: TFile,
   chapterName: string,
 ): Promise<Scene> {
-  const fm = app.metadataCache.getFileCache(file)?.frontmatter ?? {};
+  const fm = await getFrontmatter(app, file);
   const content = await app.vault.cachedRead(file);
   const body = content.replace(FRONTMATTER_RE, "");
 
@@ -152,8 +172,8 @@ export async function buildBooks(
 ): Promise<Book[]> {
   const books: Book[] = [];
   for (const file of app.vault.getMarkdownFiles()) {
-    const fm = app.metadataCache.getFileCache(file)?.frontmatter;
-    if (!fm || fm.type !== "book") continue;
+    const fm = await getFrontmatter(app, file);
+    if (fm.type !== "book") continue;
 
     const bookFolder = file.parent;
     if (!bookFolder) continue;
@@ -168,7 +188,9 @@ export async function buildBooks(
     const order: OrderSpec = {
       chapters: Array.isArray(fm.chapterOrder) ? fm.chapterOrder.map(String) : [],
       scenes:
-        fm.sceneOrder && typeof fm.sceneOrder === "object" ? fm.sceneOrder : {},
+        fm.sceneOrder && typeof fm.sceneOrder === "object"
+          ? (fm.sceneOrder as Record<string, string[]>)
+          : {},
     };
 
     const chapters =
