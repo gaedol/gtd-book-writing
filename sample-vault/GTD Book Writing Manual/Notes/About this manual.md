@@ -4,5 +4,5 @@ This manual is dogfood: a real book managed by the GTD Book Writing plugin, with
 
 ## Findings while writing docs as a book
 
-- Reserved folder names are **global settings**, not per-book — a non-fiction book can't rename `Characters/` to `Concepts/` without renaming it for every book in the vault. Candidate for the backlog.
-- `Characters/` and `Locations/` are simply unused here; the parser doesn't mind their absence.
+- ~~Reserved folder names are global settings, not per-book.~~ **Fixed 2026-07-03**: material folders are now per-book via `materials:` in the index note — this manual uses `[Concepts, Terminology]` while The Salt Road uses `[Characters, Locations, Research]`. Only `Manuscript/` and `Notes/` remain structural (global).
+- The plugin doesn't mind absent material folders; they're created on first use by **New material note**.

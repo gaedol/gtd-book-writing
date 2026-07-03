@@ -5,7 +5,12 @@ import {
   WorkspaceLeaf,
   debounce,
 } from "obsidian";
-import { Book, DEFAULT_RESERVED, ReservedNames } from "./model";
+import {
+  Book,
+  DEFAULT_MATERIALS,
+  DEFAULT_STRUCTURAL,
+  StructuralNames,
+} from "./model";
 import { buildBooks } from "./parser";
 import { registerCommands } from "./commands";
 import { registerSceneCard } from "./scene-card";
@@ -13,11 +18,13 @@ import { GtdBookSettingTab } from "./settings";
 import { GtdBookView, VIEW_TYPE_GTD_BOOK } from "./view";
 
 export interface GtdBookSettings {
-  reserved: ReservedNames;
+  structural: StructuralNames;
+  defaultMaterials: string[];
 }
 
 const DEFAULT_SETTINGS: GtdBookSettings = {
-  reserved: { ...DEFAULT_RESERVED },
+  structural: { ...DEFAULT_STRUCTURAL },
+  defaultMaterials: [...DEFAULT_MATERIALS],
 };
 
 export default class GtdBookPlugin extends Plugin {
@@ -62,7 +69,11 @@ export default class GtdBookPlugin extends Plugin {
   }
 
   buildBooks(): Promise<Book[]> {
-    return buildBooks(this.app, this.settings.reserved);
+    return buildBooks(
+      this.app,
+      this.settings.structural,
+      this.settings.defaultMaterials,
+    );
   }
 
   private async insertSceneCard(): Promise<void> {
@@ -147,10 +158,19 @@ export default class GtdBookPlugin extends Plugin {
 
   async loadSettings(): Promise<void> {
     const data = await this.loadData();
+    // Migrate pre-materials settings ({ reserved: {...} }).
+    const legacy = data?.reserved;
     this.settings = {
-      ...DEFAULT_SETTINGS,
-      ...data,
-      reserved: { ...DEFAULT_RESERVED, ...(data?.reserved ?? {}) },
+      structural: {
+        ...DEFAULT_STRUCTURAL,
+        ...(legacy
+          ? { manuscript: legacy.manuscript, notes: legacy.notes }
+          : {}),
+        ...(data?.structural ?? {}),
+      },
+      defaultMaterials: Array.isArray(data?.defaultMaterials)
+        ? data.defaultMaterials
+        : [...DEFAULT_MATERIALS],
     };
   }
 

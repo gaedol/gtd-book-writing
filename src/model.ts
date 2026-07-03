@@ -42,21 +42,20 @@ export interface Book {
   deadline: string | null; // ISO YYYY-MM-DD
   dailyTarget: number | null;
   lastReview: string | null; // ISO YYYY-MM-DD
+  materials: string[]; // per-book material folders (index fm `materials:`)
   chapters: Chapter[]; // ordered, flattened across acts; chapter.actName preserves grouping
 }
 
-export interface ReservedNames {
+// Structural folders have plugin behavior attached (tracking, compile output)
+// and are renameable globally. Material folders are free-form per book.
+export interface StructuralNames {
   manuscript: string;
-  characters: string;
-  locations: string;
-  research: string;
   notes: string;
 }
 
-export const DEFAULT_RESERVED: ReservedNames = {
+export const DEFAULT_STRUCTURAL: StructuralNames = {
   manuscript: "Manuscript",
-  characters: "Characters",
-  locations: "Locations",
-  research: "Research",
   notes: "Notes",
 };
+
+export const DEFAULT_MATERIALS = ["Characters", "Locations", "Research"];

@@ -2,8 +2,9 @@ import { App, TFile, TFolder } from "obsidian";
 import {
   Book,
   Chapter,
-  ReservedNames,
+  DEFAULT_MATERIALS,
   Scene,
+  StructuralNames,
   isSceneStatus,
 } from "./model";
 
@@ -146,7 +147,8 @@ export async function parseSceneByPath(
 
 export async function buildBooks(
   app: App,
-  reserved: ReservedNames,
+  structural: StructuralNames,
+  defaultMaterials: string[] = DEFAULT_MATERIALS,
 ): Promise<Book[]> {
   const books: Book[] = [];
   for (const file of app.vault.getMarkdownFiles()) {
@@ -157,7 +159,7 @@ export async function buildBooks(
     if (!bookFolder) continue;
 
     const manuscript = app.vault.getAbstractFileByPath(
-      `${bookFolder.path}/${reserved.manuscript}`,
+      `${bookFolder.path}/${structural.manuscript}`,
     );
     const sequentialNames = new Set<string>(
       normalizeContexts(fm.sequential),
@@ -181,6 +183,9 @@ export async function buildBooks(
       deadline: normalizeDate(fm.deadline),
       dailyTarget: typeof fm.dailyTarget === "number" ? fm.dailyTarget : null,
       lastReview: normalizeDate(fm.lastReview),
+      materials: Array.isArray(fm.materials)
+        ? fm.materials.map(String)
+        : [...defaultMaterials],
       chapters,
     });
   }

@@ -143,7 +143,7 @@ async function runCompile(
   }
   const out = compileBook(book, (s) => prose.get(s.path) ?? "", opts);
 
-  const notesFolder = `${book.folderPath}/${plugin.settings.reserved.notes}`;
+  const notesFolder = `${book.folderPath}/${plugin.settings.structural.notes}`;
   if (!app.vault.getAbstractFileByPath(normalizePath(notesFolder))) {
     await app.vault.createFolder(normalizePath(notesFolder));
   }

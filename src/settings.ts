@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type GtdBookPlugin from "./main";
-import { DEFAULT_RESERVED, ReservedNames } from "./model";
+import { DEFAULT_MATERIALS, DEFAULT_STRUCTURAL } from "./model";
 
 export class GtdBookSettingTab extends PluginSettingTab {
   private plugin: GtdBookPlugin;
@@ -14,34 +14,63 @@ export class GtdBookSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h3", { text: "Reserved folder names" });
+    containerEl.createEl("h3", { text: "Structural folders" });
     containerEl.createEl("p", {
-      text: "Rename the structural folders the plugin recognizes (e.g. for localization). Defaults are English.",
+      text: "Folders the plugin acts on, shared by all books. Rename for localization.",
       cls: "setting-item-description",
     });
 
-    const keys: (keyof ReservedNames)[] = [
-      "manuscript",
-      "characters",
-      "locations",
-      "research",
-      "notes",
-    ];
+    new Setting(containerEl)
+      .setName("Manuscript")
+      .setDesc(`Tracked chapters and scenes. Default: ${DEFAULT_STRUCTURAL.manuscript}`)
+      .addText((t) =>
+        t
+          .setPlaceholder(DEFAULT_STRUCTURAL.manuscript)
+          .setValue(this.plugin.settings.structural.manuscript)
+          .onChange(async (v) => {
+            this.plugin.settings.structural.manuscript =
+              v.trim() || DEFAULT_STRUCTURAL.manuscript;
+            await this.plugin.saveSettings();
+          }),
+      );
 
-    for (const key of keys) {
-      new Setting(containerEl)
-        .setName(key[0].toUpperCase() + key.slice(1))
-        .setDesc(`Default: ${DEFAULT_RESERVED[key]}`)
-        .addText((text) =>
-          text
-            .setPlaceholder(DEFAULT_RESERVED[key])
-            .setValue(this.plugin.settings.reserved[key])
-            .onChange(async (value) => {
-              this.plugin.settings.reserved[key] =
-                value.trim() || DEFAULT_RESERVED[key];
-              await this.plugin.saveSettings();
-            }),
-        );
-    }
+    new Setting(containerEl)
+      .setName("Notes")
+      .setDesc(`Compile output lands here. Default: ${DEFAULT_STRUCTURAL.notes}`)
+      .addText((t) =>
+        t
+          .setPlaceholder(DEFAULT_STRUCTURAL.notes)
+          .setValue(this.plugin.settings.structural.notes)
+          .onChange(async (v) => {
+            this.plugin.settings.structural.notes =
+              v.trim() || DEFAULT_STRUCTURAL.notes;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    containerEl.createEl("h3", { text: "Material folders" });
+    containerEl.createEl("p", {
+      text: "Each book chooses its own material folders via `materials:` in its index note (e.g. Characters for a novel, Concepts for a manual). This list is only the default for newly created books.",
+      cls: "setting-item-description",
+    });
+
+    new Setting(containerEl)
+      .setName("Defaults for new books")
+      .setDesc("Comma-separated folder names.")
+      .addText((t) =>
+        t
+          .setPlaceholder(DEFAULT_MATERIALS.join(", "))
+          .setValue(this.plugin.settings.defaultMaterials.join(", "))
+          .onChange(async (v) => {
+            const names = v
+              .split(",")
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+            this.plugin.settings.defaultMaterials = names.length
+              ? names
+              : [...DEFAULT_MATERIALS];
+            await this.plugin.saveSettings();
+          }),
+      );
   }
 }

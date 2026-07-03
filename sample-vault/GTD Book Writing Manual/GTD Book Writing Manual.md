@@ -4,6 +4,9 @@ title: GTD Book Writing Manual
 dailyTarget: 400
 sequential:
   - 01 Getting started
+materials:
+  - Concepts
+  - Terminology
 ---
 # GTD Book Writing Manual
 

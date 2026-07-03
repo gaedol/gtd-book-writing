@@ -1,5 +1,15 @@
-import { App, Modal, Notice, Setting, TFile, TFolder, normalizePath } from "obsidian";
+import {
+  App,
+  FuzzySuggestModal,
+  Modal,
+  Notice,
+  Setting,
+  TFile,
+  TFolder,
+  normalizePath,
+} from "obsidian";
 import type GtdBookPlugin from "./main";
+import { Book } from "./model";
 import { openCompileModal } from "./compile";
 
 class PromptModal extends Modal {
@@ -84,9 +94,31 @@ async function bookFolderFor(plugin: GtdBookPlugin, path: string): Promise<strin
   return best ?? (books.length === 1 ? books[0].folderPath : null);
 }
 
+class MaterialFolderModal extends FuzzySuggestModal<string> {
+  private folders: string[];
+  private onPick: (folder: string) => void;
+
+  constructor(app: App, folders: string[], onPick: (folder: string) => void) {
+    super(app);
+    this.folders = folders;
+    this.onPick = onPick;
+    this.setPlaceholder("Which folder?");
+  }
+
+  getItems(): string[] {
+    return this.folders;
+  }
+  getItemText(item: string): string {
+    return item;
+  }
+  onChooseItem(item: string): void {
+    this.onPick(item);
+  }
+}
+
 export function registerCommands(plugin: GtdBookPlugin): void {
   const app = plugin.app;
-  const reserved = () => plugin.settings.reserved;
+  const structural = () => plugin.settings.structural;
 
   plugin.addCommand({
     id: "new-book",
@@ -98,15 +130,61 @@ export function registerCommands(plugin: GtdBookPlugin): void {
           new Notice("A folder with that name already exists.");
           return;
         }
+        const materials = plugin.settings.defaultMaterials;
         await ensureFolder(app, root);
-        for (const sub of Object.values(reserved())) {
+        for (const sub of [
+          structural().manuscript,
+          structural().notes,
+          ...materials,
+        ]) {
           await ensureFolder(app, `${root}/${sub}`);
         }
         const index = `${root}/${title}.md`;
-        const fm = ["---", "type: book", `title: ${title}`, "deadline:", "dailyTarget:", "sequential: []", "---", "", `# ${title}`, ""].join("\n");
+        const fm = [
+          "---",
+          "type: book",
+          `title: ${title}`,
+          "deadline:",
+          "dailyTarget:",
+          "sequential: []",
+          `materials: [${materials.join(", ")}]`,
+          "---",
+          "",
+          `# ${title}`,
+          "",
+        ].join("\n");
         const file = await app.vault.create(index, fm);
         await app.workspace.getLeaf(false).openFile(file as TFile);
         new Notice(`Created book "${title}".`);
+      }).open();
+    },
+  });
+
+  plugin.addCommand({
+    id: "new-material-note",
+    name: "New material note",
+    callback: async () => {
+      const active = app.workspace.getActiveFile();
+      const bookFolder = active ? await bookFolderFor(plugin, active.path) : null;
+      if (!bookFolder) {
+        new Notice("Open a note inside a book first.");
+        return;
+      }
+      const books = await plugin.buildBooks();
+      const book = books.find((b: Book) => b.folderPath === bookFolder);
+      const folders = [...(book?.materials ?? []), structural().notes];
+      new MaterialFolderModal(app, folders, (folder) => {
+        new PromptModal(app, `New note in ${folder}`, "Title", async (title) => {
+          await ensureFolder(app, `${bookFolder}/${folder}`);
+          const path = normalizePath(`${bookFolder}/${folder}/${title}.md`);
+          if (app.vault.getAbstractFileByPath(path)) {
+            new Notice("A note with that title already exists there.");
+            return;
+          }
+          const file = await app.vault.create(path, `# ${title}\n\n`);
+          await app.workspace.getLeaf(false).openFile(file as TFile);
+          new Notice(`Created "${title}" in ${folder}.`);
+        }).open();
       }).open();
     },
   });
@@ -121,7 +199,7 @@ export function registerCommands(plugin: GtdBookPlugin): void {
         new Notice("Open a note inside a book first.");
         return;
       }
-      const manuscript = `${bookFolder}/${reserved().manuscript}`;
+      const manuscript = `${bookFolder}/${structural().manuscript}`;
       await ensureFolder(app, manuscript);
       const folder = app.vault.getAbstractFileByPath(manuscript);
       const count = folder instanceof TFolder
@@ -161,7 +239,7 @@ export function registerCommands(plugin: GtdBookPlugin): void {
         new Notice("Open a note inside a chapter first.");
         return;
       }
-      const manuscript = `${bookFolder}/${reserved().manuscript}/`;
+      const manuscript = `${bookFolder}/${structural().manuscript}/`;
       if (!active.path.startsWith(manuscript)) {
         new Notice("Open a note inside a chapter folder first.");
         return;

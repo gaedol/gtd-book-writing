@@ -5,6 +5,10 @@ deadline: 2026-08-06
 dailyTarget: 800
 sequential:
   - 01 Arrival
+materials:
+  - Characters
+  - Locations
+  - Research
 ---
 # The Salt Road
 
