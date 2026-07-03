@@ -55,11 +55,24 @@ export class GtdBookView extends ItemView {
       });
       return;
     }
-    const book = books[0]; // v1: first book
+    books.sort((a, b) => a.title.localeCompare(b.title));
+    const book =
+      books.find((b) => b.indexPath === this.plugin.settings.activeBookPath) ??
+      books[0];
     const today = todayISO();
 
     const header = root.createDiv({ cls: "gtd-header" });
-    header.createSpan({ cls: "gtd-title", text: book.title });
+    if (books.length > 1) {
+      const select = header.createEl("select", { cls: "gtd-book-select" });
+      for (const b of books) {
+        const opt = select.createEl("option", { text: b.title });
+        opt.value = b.indexPath;
+        if (b.indexPath === book.indexPath) opt.selected = true;
+      }
+      select.onchange = () => void this.plugin.setActiveBook(select.value);
+    } else {
+      header.createSpan({ cls: "gtd-title", text: book.title });
+    }
 
     this.renderTabs(root);
     const body = root.createDiv({ cls: "gtd-body" });

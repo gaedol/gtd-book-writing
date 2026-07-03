@@ -4,6 +4,7 @@
 
 .gtd-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .gtd-title { font-weight: 600; }
+.gtd-book-select { font-weight: 600; max-width: 100%; }
 
 .gtd-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--background-modifier-border); margin-bottom: 12px; }
 .gtd-tab {

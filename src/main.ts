@@ -20,11 +20,13 @@ import { GtdBookView, VIEW_TYPE_GTD_BOOK } from "./view";
 export interface GtdBookSettings {
   structural: StructuralNames;
   defaultMaterials: string[];
+  activeBookPath: string | null; // index path of the book shown in the panel
 }
 
 const DEFAULT_SETTINGS: GtdBookSettings = {
   structural: { ...DEFAULT_STRUCTURAL },
   defaultMaterials: [...DEFAULT_MATERIALS],
+  activeBookPath: null,
 };
 
 export default class GtdBookPlugin extends Plugin {
@@ -171,7 +173,14 @@ export default class GtdBookPlugin extends Plugin {
       defaultMaterials: Array.isArray(data?.defaultMaterials)
         ? data.defaultMaterials
         : [...DEFAULT_MATERIALS],
+      activeBookPath:
+        typeof data?.activeBookPath === "string" ? data.activeBookPath : null,
     };
+  }
+
+  async setActiveBook(indexPath: string): Promise<void> {
+    this.settings.activeBookPath = indexPath;
+    await this.saveSettings();
   }
 
   async saveSettings(): Promise<void> {
