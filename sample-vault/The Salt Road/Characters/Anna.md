@@ -1,6 +1,3 @@
-
-
-
 # Anna Vereza
 
 Protagonist. Late thirties. Left the salt town at twenty-six after a quarrel she has never explained; returns to settle her father's estate.

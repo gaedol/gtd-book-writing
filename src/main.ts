@@ -93,7 +93,7 @@ export default class GtdBookPlugin extends Plugin {
       return;
     }
     const block = "```gtd-scene\n```\n\n";
-    const fm = content.match(/^---\n[\s\S]*?\n---\n/);
+    const fm = content.match(/^﻿?\s*---\r?\n[\s\S]*?\r?\n---[ \t]*\r?\n/);
     const next = fm
       ? content.slice(0, fm[0].length) + block + content.slice(fm[0].length)
       : block + content;

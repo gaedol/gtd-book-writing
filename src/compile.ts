@@ -15,7 +15,7 @@ export const DEFAULT_COMPILE: CompileOptions = {
   separator: "* * *",
 };
 
-const FRONTMATTER_RE = /^---\n[\s\S]*?\n---\n?/;
+const FRONTMATTER_RE = /^﻿?\s*---\r?\n[\s\S]*?\r?\n---[ \t]*\r?\n?/;
 const GTD_BLOCK_RE = /^```gtd-scene[^\n]*\n[\s\S]*?\n?```[ \t]*\n?/m;
 
 // Remove a `## Heading` section: the heading line through (not including)

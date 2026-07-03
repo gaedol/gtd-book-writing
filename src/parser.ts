@@ -9,7 +9,9 @@ import {
 } from "./model";
 
 const OPEN_TASK_RE = /^[ \t]*[-*] \[ \] (.+)$/m;
-const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n?/;
+// Tolerates a BOM, leading blank lines (sync tools and stray keystrokes add
+// them), and CRLF. Obsidian's own cache does not — this fallback must.
+const FRONTMATTER_RE = /^﻿?\s*---\r?\n([\s\S]*?)\r?\n---[ \t]*\r?\n?/;
 
 // The metadata cache populates asynchronously; a file not yet indexed has no
 // cache entry, which must not make its book/scene vanish. Fall back to

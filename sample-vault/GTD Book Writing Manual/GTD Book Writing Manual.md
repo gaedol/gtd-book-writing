@@ -1,6 +1,3 @@
-
-
-
 ---
 type: book
 title: GTD Book Writing Manual
