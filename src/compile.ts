@@ -1,6 +1,7 @@
 import { App, Modal, Notice, Setting, TFile, normalizePath } from "obsidian";
 import type GtdBookPlugin from "./main";
 import { Book, STATUS_ORDER, Scene, SceneStatus } from "./model";
+import { todayISO } from "./logic";
 
 export interface CompileOptions {
   statuses: Set<SceneStatus>;
@@ -147,7 +148,7 @@ async function runCompile(
   if (!app.vault.getAbstractFileByPath(normalizePath(notesFolder))) {
     await app.vault.createFolder(normalizePath(notesFolder));
   }
-  const date = new Date().toISOString().slice(0, 10);
+  const date = todayISO();
   const path = normalizePath(`${notesFolder}/${book.title} — compiled ${date}.md`);
 
   const existing = app.vault.getAbstractFileByPath(path);

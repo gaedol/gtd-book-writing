@@ -1,6 +1,7 @@
 ---
 status: outlined
-context: [draft]
+context:
+  - draft
 wordGoal: 400
 ---
 ```gtd-scene

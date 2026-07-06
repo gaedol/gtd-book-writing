@@ -13,6 +13,7 @@ import {
 } from "./model";
 import { buildBooks } from "./parser";
 import { registerCommands } from "./commands";
+import { todayISO } from "./logic";
 import { registerSceneCard } from "./scene-card";
 import { GtdBookSettingTab } from "./settings";
 import { GtdBookView, VIEW_TYPE_GTD_BOOK } from "./view";
@@ -130,7 +131,7 @@ export default class GtdBookPlugin extends Plugin {
     const file = this.app.vault.getAbstractFileByPath(indexPath);
     if (!(file instanceof TFile)) return;
     await this.app.fileManager.processFrontMatter(file, (fm) => {
-      fm.lastReview = new Date().toISOString().slice(0, 10);
+      fm.lastReview = todayISO();
     });
     new Notice("Weekly review marked done.");
     this.refreshViews();

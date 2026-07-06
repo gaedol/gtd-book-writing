@@ -107,8 +107,12 @@ export function pacing(book: Book, today: string): Pacing {
   return { wordsToGo, daysLeft, perDay };
 }
 
+// Local calendar date, not UTC — between midnight and UTC-offset hours the
+// two differ, which skews defer checks, pacing, and compile filenames.
 export function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
 export interface StatusSuggestion {
