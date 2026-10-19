@@ -1,7 +1,7 @@
 {
   "id": "gtd-book-writing",
   "name": "GTD Book Writing",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "minAppVersion": "1.7.2",
   "description": "Write books the GTD way: next actions, available-now scenes, stalled detection, and pacing.",
   "author": "Marco Guidetti",
