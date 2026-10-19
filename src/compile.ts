@@ -1,4 +1,4 @@
-import { App, Modal, Notice, Setting, TFile, normalizePath } from "obsidian";
+import { Modal, Notice, Setting, TFile, normalizePath } from "obsidian";
 import type GtdBookPlugin from "./main";
 import { Book, STATUS_ORDER, Scene, SceneStatus } from "./model";
 import { todayISO } from "./logic";
@@ -16,7 +16,7 @@ export const DEFAULT_COMPILE: CompileOptions = {
   separator: "* * *",
 };
 
-const FRONTMATTER_RE = /^﻿?\s*---\r?\n[\s\S]*?\r?\n---[ \t]*\r?\n?/;
+const FRONTMATTER_RE = /^\uFEFF?\s*---\r?\n[\s\S]*?\r?\n---[ \t]*\r?\n?/;
 const GTD_BLOCK_RE = /^```gtd-scene[^\n]*\n[\s\S]*?\n?```[ \t]*\n?/m;
 
 // Remove a `## Heading` section: the heading line through (not including)

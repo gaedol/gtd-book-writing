@@ -362,7 +362,7 @@ export class GtdBookView extends ItemView {
     if (!scene.wordGoal) return;
     const bar = parent.createDiv({ cls: "gtd-bar" });
     const pct = Math.min(100, Math.round((scene.words / scene.wordGoal) * 100));
-    bar.createDiv({ cls: "gtd-bar-fill" }).style.width = `${pct}%`;
+    bar.createDiv({ cls: "gtd-bar-fill" }).setCssStyles({ width: `${pct}%` });
     parent.createDiv({
       cls: "gtd-wc",
       text: `${scene.words.toLocaleString()} / ${scene.wordGoal.toLocaleString()}`,

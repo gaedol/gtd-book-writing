@@ -14,11 +14,10 @@ export class GtdBookSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h3", { text: "Structural folders" });
-    containerEl.createEl("p", {
-      text: "Folders the plugin acts on, shared by all books. Rename for localization.",
-      cls: "setting-item-description",
-    });
+    new Setting(containerEl)
+      .setName("Structural folders")
+      .setDesc("Folders the plugin acts on, shared by all books. Rename for localization.")
+      .setHeading();
 
     new Setting(containerEl)
       .setName("Manuscript")
@@ -48,11 +47,10 @@ export class GtdBookSettingTab extends PluginSettingTab {
           }),
       );
 
-    containerEl.createEl("h3", { text: "Material folders" });
-    containerEl.createEl("p", {
-      text: "Each book chooses its own material folders via `materials:` in its index note (e.g. Characters for a novel, Concepts for a manual). This list is only the default for newly created books.",
-      cls: "setting-item-description",
-    });
+    new Setting(containerEl)
+      .setName("Material folders")
+      .setDesc("Each book chooses its own material folders via `materials:` in its index note (e.g. Characters for a novel, Concepts for a manual). This list is only the default for newly created books.")
+      .setHeading();
 
     new Setting(containerEl)
       .setName("Defaults for new books")

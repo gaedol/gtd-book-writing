@@ -1,6 +1,6 @@
 import { TFile } from "obsidian";
 import type GtdBookPlugin from "./main";
-import { STATUS_ORDER, Scene, SceneStatus } from "./model";
+import { STATUS_ORDER } from "./model";
 import { nextAction, statusSuggestion } from "./logic";
 import { parseSceneByPath } from "./parser";
 
@@ -53,11 +53,13 @@ async function renderCard(
       cls: "gtd-seg-item" + (scene.status === s ? " is-on" : ""),
       text: s,
     });
-    b.onclick = async () => {
-      await app.fileManager.processFrontMatter(file, (fm) => {
-        fm.status = s as SceneStatus;
-      });
-      await renderCard(plugin, el, path);
+    b.onclick = () => {
+      void (async () => {
+        await app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
+          fm.status = s;
+        });
+        await renderCard(plugin, el, path);
+      })();
     };
   }
 
@@ -95,11 +97,13 @@ async function renderCard(
       cls: "gtd-suggest-btn",
       text: `→ ${suggestion.to}`,
     });
-    apply.onclick = async () => {
-      await app.fileManager.processFrontMatter(file, (fm) => {
-        fm.status = suggestion.to;
-      });
-      await renderCard(plugin, el, path);
+    apply.onclick = () => {
+      void (async () => {
+        await app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
+          fm.status = suggestion.to;
+        });
+        await renderCard(plugin, el, path);
+      })();
     };
   }
 
@@ -115,11 +119,13 @@ async function renderCard(
     cls: "gtd-flagtoggle" + (scene.flagged ? " is-on" : ""),
     text: scene.flagged ? "★ flagged" : "☆ flag",
   });
-  flag.onclick = async () => {
-    await app.fileManager.processFrontMatter(file, (fm) => {
-      fm.flagged = !scene.flagged;
-    });
-    await renderCard(plugin, el, path);
+  flag.onclick = () => {
+    void (async () => {
+      await app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
+        fm.flagged = !scene.flagged;
+      });
+      await renderCard(plugin, el, path);
+    })();
   };
   if (scene.wordGoal) {
     const wc = meta.createSpan({ cls: "gtd-wc-inline" });
@@ -128,7 +134,7 @@ async function renderCard(
     });
     const bar = wc.createDiv({ cls: "gtd-bar gtd-bar-inline" });
     const pct = Math.min(100, Math.round((scene.words / scene.wordGoal) * 100));
-    bar.createDiv({ cls: "gtd-bar-fill" }).style.width = `${pct}%`;
+    bar.createDiv({ cls: "gtd-bar-fill" }).setCssStyles({ width: `${pct}%` });
   }
 
   // Beats

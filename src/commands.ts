@@ -4,7 +4,6 @@ import {
   Modal,
   Notice,
   Setting,
-  TFile,
   TFolder,
   normalizePath,
 } from "obsidian";
@@ -14,11 +13,11 @@ import { openCompileModal } from "./compile";
 
 class PromptModal extends Modal {
   private value = "";
-  private onSubmit: (value: string) => void;
+  private onSubmit: (value: string) => void | Promise<void>;
   private title: string;
   private placeholder: string;
 
-  constructor(app: App, title: string, placeholder: string, onSubmit: (value: string) => void) {
+  constructor(app: App, title: string, placeholder: string, onSubmit: (value: string) => void | Promise<void>) {
     super(app);
     this.title = title;
     this.placeholder = placeholder;
@@ -29,7 +28,7 @@ class PromptModal extends Modal {
     this.titleEl.setText(this.title);
     new Setting(this.contentEl).addText((t) => {
       t.setPlaceholder(this.placeholder);
-      t.inputEl.style.width = "100%";
+      t.inputEl.setCssStyles({ width: "100%" });
       t.onChange((v) => (this.value = v));
       t.inputEl.addEventListener("keydown", (e) => {
         if (e.key === "Enter") this.submit();
@@ -45,7 +44,7 @@ class PromptModal extends Modal {
     const v = this.value.trim();
     if (v) {
       this.close();
-      this.onSubmit(v);
+      void this.onSubmit(v);
     }
   }
 
@@ -154,7 +153,7 @@ export function registerCommands(plugin: GtdBookPlugin): void {
           "",
         ].join("\n");
         const file = await app.vault.create(index, fm);
-        await app.workspace.getLeaf(false).openFile(file as TFile);
+        await app.workspace.getLeaf(false).openFile(file);
         new Notice(`Created book "${title}".`);
       }).open();
     },
@@ -182,7 +181,7 @@ export function registerCommands(plugin: GtdBookPlugin): void {
             return;
           }
           const file = await app.vault.create(path, `# ${title}\n\n`);
-          await app.workspace.getLeaf(false).openFile(file as TFile);
+          await app.workspace.getLeaf(false).openFile(file);
           new Notice(`Created "${title}" in ${folder}.`);
         }).open();
       }).open();
@@ -256,7 +255,7 @@ export function registerCommands(plugin: GtdBookPlugin): void {
           return;
         }
         const file = await app.vault.create(path, sceneTemplate());
-        await app.workspace.getLeaf(false).openFile(file as TFile);
+        await app.workspace.getLeaf(false).openFile(file);
         new Notice(`Created scene "${title}".`);
       }).open();
     },

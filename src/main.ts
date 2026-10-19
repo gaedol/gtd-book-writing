@@ -30,6 +30,14 @@ const DEFAULT_SETTINGS: GtdBookSettings = {
   activeBookPath: null,
 };
 
+// Shape of data.json across versions (older builds stored `reserved`).
+interface StoredData {
+  reserved?: { manuscript?: string; notes?: string };
+  structural?: Partial<StructuralNames>;
+  defaultMaterials?: unknown;
+  activeBookPath?: unknown;
+}
+
 export default class GtdBookPlugin extends Plugin {
   settings: GtdBookSettings = DEFAULT_SETTINGS;
 
@@ -70,10 +78,6 @@ export default class GtdBookPlugin extends Plugin {
     this.registerEvent(this.app.vault.on("delete", refresh));
   }
 
-  onunload(): void {
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_GTD_BOOK);
-  }
-
   buildBooks(): Promise<Book[]> {
     return buildBooks(
       this.app,
@@ -94,7 +98,7 @@ export default class GtdBookPlugin extends Plugin {
       return;
     }
     const block = "```gtd-scene\n```\n\n";
-    const fm = content.match(/^﻿?\s*---\r?\n[\s\S]*?\r?\n---[ \t]*\r?\n/);
+    const fm = content.match(/^\uFEFF?\s*---\r?\n[\s\S]*?\r?\n---[ \t]*\r?\n/);
     const next = fm
       ? content.slice(0, fm[0].length) + block + content.slice(fm[0].length)
       : block + content;
@@ -109,9 +113,10 @@ export default class GtdBookPlugin extends Plugin {
   ): Promise<void> {
     const file = this.app.vault.getAbstractFileByPath(indexPath);
     if (!(file instanceof TFile)) return;
-    await this.app.fileManager.processFrontMatter(file, (fm) => {
-      const so =
-        fm.sceneOrder && typeof fm.sceneOrder === "object" ? fm.sceneOrder : {};
+    await this.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
+      const so = (fm.sceneOrder && typeof fm.sceneOrder === "object"
+        ? fm.sceneOrder
+        : {}) as Record<string, string[]>;
       so[chapterName] = sceneTitles;
       fm.sceneOrder = so;
     });
@@ -121,7 +126,7 @@ export default class GtdBookPlugin extends Plugin {
   async reorderChapters(indexPath: string, chapterNames: string[]): Promise<void> {
     const file = this.app.vault.getAbstractFileByPath(indexPath);
     if (!(file instanceof TFile)) return;
-    await this.app.fileManager.processFrontMatter(file, (fm) => {
+    await this.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
       fm.chapterOrder = chapterNames;
     });
     this.refreshViews();
@@ -130,7 +135,7 @@ export default class GtdBookPlugin extends Plugin {
   async markReviewDone(indexPath: string): Promise<void> {
     const file = this.app.vault.getAbstractFileByPath(indexPath);
     if (!(file instanceof TFile)) return;
-    await this.app.fileManager.processFrontMatter(file, (fm) => {
+    await this.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
       fm.lastReview = todayISO();
     });
     new Notice("Weekly review marked done.");
@@ -140,7 +145,7 @@ export default class GtdBookPlugin extends Plugin {
   openScene(path: string): void {
     const file = this.app.vault.getAbstractFileByPath(path);
     if (file instanceof TFile) {
-      this.app.workspace.getLeaf(false).openFile(file);
+      void this.app.workspace.getLeaf(false).openFile(file);
     }
   }
 
@@ -159,26 +164,23 @@ export default class GtdBookPlugin extends Plugin {
       leaf = workspace.getRightLeaf(false);
       await leaf?.setViewState({ type: VIEW_TYPE_GTD_BOOK, active: true });
     }
-    if (leaf) workspace.revealLeaf(leaf);
+    if (leaf) void workspace.revealLeaf(leaf);
   }
 
   async loadSettings(): Promise<void> {
-    const data = await this.loadData();
+    const data = ((await this.loadData()) ?? {}) as StoredData;
     // Migrate pre-materials settings ({ reserved: {...} }).
-    const legacy = data?.reserved;
+    const structural = { ...DEFAULT_STRUCTURAL };
+    if (data.reserved?.manuscript) structural.manuscript = data.reserved.manuscript;
+    if (data.reserved?.notes) structural.notes = data.reserved.notes;
+    Object.assign(structural, data.structural ?? {});
     this.settings = {
-      structural: {
-        ...DEFAULT_STRUCTURAL,
-        ...(legacy
-          ? { manuscript: legacy.manuscript, notes: legacy.notes }
-          : {}),
-        ...(data?.structural ?? {}),
-      },
-      defaultMaterials: Array.isArray(data?.defaultMaterials)
-        ? data.defaultMaterials
+      structural,
+      defaultMaterials: Array.isArray(data.defaultMaterials)
+        ? (data.defaultMaterials as string[])
         : [...DEFAULT_MATERIALS],
       activeBookPath:
-        typeof data?.activeBookPath === "string" ? data.activeBookPath : null,
+        typeof data.activeBookPath === "string" ? data.activeBookPath : null,
     };
   }
 

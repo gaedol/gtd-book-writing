@@ -11,7 +11,7 @@ import {
 const OPEN_TASK_RE = /^[ \t]*[-*] \[ \] (.+)$/m;
 // Tolerates a BOM, leading blank lines (sync tools and stray keystrokes add
 // them), and CRLF. Obsidian's own cache does not — this fallback must.
-const FRONTMATTER_RE = /^﻿?\s*---\r?\n([\s\S]*?)\r?\n---[ \t]*\r?\n?/;
+const FRONTMATTER_RE = /^\uFEFF?\s*---\r?\n([\s\S]*?)\r?\n---[ \t]*\r?\n?/;
 
 // The metadata cache populates asynchronously; a file not yet indexed has no
 // cache entry, which must not make its book/scene vanish. Fall back to
@@ -26,8 +26,10 @@ async function getFrontmatter(
   const m = content.match(FRONTMATTER_RE);
   if (!m) return {};
   try {
-    const parsed = parseYaml(m[1]);
-    return parsed && typeof parsed === "object" ? parsed : {};
+    const parsed: unknown = parseYaml(m[1]);
+    return parsed && typeof parsed === "object"
+      ? (parsed as Record<string, unknown>)
+      : {};
   } catch {
     return {};
   }
