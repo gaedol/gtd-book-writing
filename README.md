@@ -47,6 +47,8 @@ Only `Manuscript/` and a `Notes/` folder (where Compile writes its output) are s
 - An **explicit task always wins** over the derived default. A scene is "stalled" only when it has neither — that's the signal the Review tab surfaces.
 - **Available now** hides anything deferred, anything blocked by an earlier unfinished scene in a sequential chapter, and anything already final. What's left is genuinely workable today.
 
+Full usage guide: [MANUAL.md](MANUAL.md) — setup, the scene card, the panel, and a "what do I do if I want…" cookbook.
+
 ## Installation
 
 Not yet in the community plugin catalog. Manual install:
