@@ -4,3 +4,6 @@ main.js
 .DS_Store
 data.json
 sample-vault/That Day/
+
+# design docs (local only)
+0*-*.md
