@@ -68,7 +68,7 @@ Enable **GTD Book Writing** under Settings → Community plugins.
 
 ## Status
 
-v1 feature-complete, including compile. Actively dogfooded — this plugin's own manual is written as a book inside it. See the design docs (`01`–`07` in this repo) for the full history of decisions, and `06-setup-and-testing.md` for local build/test instructions.
+v1 feature-complete, including compile. Actively dogfooded — this plugin's own manual is written as a book inside it (see `sample-vault/`).
 
 ## License
 
