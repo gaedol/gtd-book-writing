@@ -51,22 +51,7 @@ Full usage guide: [MANUAL.md](MANUAL.md) — setup, the scene card, the panel, a
 
 ## Installation
 
-Not yet in the community plugin catalog. Manual install:
-
-```bash
-git clone https://github.com/<you>/gtd-book-writing
-cd gtd-book-writing
-npm install
-npm run build
-```
-
-Then symlink (or copy) the folder into your vault:
-
-```bash
-ln -s /path/to/gtd-book-writing "/path/to/YourVault/.obsidian/plugins/gtd-book-writing"
-```
-
-Enable **GTD Book Writing** under Settings → Community plugins.
+In Obsidian, go to **Settings → Community plugins**, browse for **GTD Book Writing**, install, and enable it.
 
 ## Status
 

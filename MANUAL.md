@@ -52,13 +52,9 @@ materials: [Characters, Locations, Research]
 
 ## 2. Setup
 
-### Install (until it is in the community catalogue)
+### Install
 
-1. Download `main.js`, `manifest.json`, and `styles.css` from the latest [release](https://github.com/gaedol/gtd-book-writing/releases).
-2. Put them in `<your vault>/.obsidian/plugins/gtd-book-writing/`.
-3. Enable **GTD Book Writing** under *Settings → Community plugins*.
-
-(Or clone the repo, `npm install`, `npm run build`, and symlink the folder into `.obsidian/plugins/`.)
+In Obsidian, open *Settings → Community plugins*, browse for **GTD Book Writing**, install, and enable it.
 
 ### Create your first book
 
