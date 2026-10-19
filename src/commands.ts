@@ -152,8 +152,15 @@ export function registerCommands(plugin: GtdBookPlugin): void {
           `# ${title}`,
           "",
         ].join("\n");
-        const file = await app.vault.create(index, fm);
-        await app.workspace.getLeaf(false).openFile(file);
+        await app.vault.create(index, fm);
+        // Scaffold a first chapter + scene so the book is ready to write.
+        const chapter = `${root}/${structural().manuscript}/01 Chapter 1`;
+        await ensureFolder(app, chapter);
+        const scene = await app.vault.create(
+          normalizePath(`${chapter}/Scene 1.md`),
+          sceneTemplate(),
+        );
+        await app.workspace.getLeaf(false).openFile(scene);
         new Notice(`Created book "${title}".`);
       }).open();
     },

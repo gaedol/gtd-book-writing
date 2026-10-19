@@ -62,18 +62,20 @@ materials: [Characters, Locations, Research]
 
 ### Create your first book
 
-Run the command **New book** (from the command palette). The plugin scaffolds:
+Run the command **New book** (from the command palette). It scaffolds the whole structure — index note, material folders, and a first chapter with a first scene — then opens the scene so you can start writing immediately:
 
 ```
 My Novel/
-├── My Novel.md          ← index note (type: book)
-├── Manuscript/          ← the tracked part
-├── Characters/          ← material folders (from your defaults)
+├── My Novel.md              ← index note (type: book)
+├── Manuscript/
+│   └── 01 Chapter 1/
+│       └── Scene 1.md       ← opens, pre-filled with the scene card
+├── Characters/              ← material folders (from your defaults)
 ├── Locations/
 └── Research/
 ```
 
-Then **New chapter** creates a numbered chapter folder, and **New scene** (run from inside a chapter) creates a scene note pre-filled with a scene card, a Beats section, and a Draft heading.
+Rename that first chapter/scene as you like. Add more with **New chapter** and **New scene** (run from inside a chapter).
 
 ### Open the panel
 
