@@ -72,4 +72,4 @@ v1 feature-complete, including compile. Actively dogfooded — this plugin's own
 
 ## License
 
-MIT
+GPL-3.0-or-later — see [LICENSE](LICENSE).
