@@ -1,6 +1,6 @@
 {
   "name": "gtd-book-writing",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GTD for book writing, an Obsidian plugin.",
   "main": "main.js",
   "type": "module",
